@@ -1,0 +1,60 @@
+// ライブコーディング用テンプレート
+
+// 1. 空配列の作成 [1, 2]
+const arr = []; [1, 3]
+console.log("--- 初期設定: 空配列 ---");
+console.log(`配列の作成: ${arr} [1, 2]`);
+console.log(`配列の長さ (初期): ${arr.length} [4, 5]`);
+
+// 2. 空オブジェクトの作成 (オブジェクトリテラル構文を使用) [3, 6]
+const obj = {}; [3]
+console.log("--- 初期設定: 空オブジェクト ---");
+console.log(`オブジェクトの作成: ${JSON.stringify(obj)} [6]`);
+console.log(`オブジェクトのプロパティ数: ${Object.keys(obj).length} [7, 8]`);
+
+// 3. ループ処理 (forループを使用) [9]
+const loopLimit = 5;
+console.log(`--- ループ処理 (0から${loopLimit - 1}まで) ---`);
+
+for (let i = 0; i < loopLimit; i++) {
+  // ループごとの処理開始をログ出力
+  console.log(`\n--- ループ開始 (i = ${i}) ---`); [9]
+
+  // 配列に要素を追加する例
+  arr.push(`element_${i}`); [4, 10, 11]
+  console.log(`配列に追加: arr.push('element_${i}')`); [11]
+  console.log(`現在の配列: [${arr.join(", ")}] [5]`);
+  console.log(`現在の配列の長さ: ${arr.length} [4, 5]`);
+
+  // オブジェクトにプロパティを追加する例
+  const key = `key${i}`;
+  const value = `value${i}`;
+  obj[key] = value; [3]
+  console.log(`オブジェクトにプロパティを設定: obj['${key}'] = '${value}'`);
+  console.log(`現在のオブジェクト: ${JSON.stringify(obj)} [6]`);
+
+  // 条件分岐の例
+  if (i % 2 === 0) { // 偶数チェック
+    console.log(`i = ${i} は偶数です。`);
+  } else {
+    console.log(`i = ${i} は奇数です。`);
+  }
+}
+
+// 4. ループ後の最終的なログ出力
+console.log("\n--- ループ終了後の最終結果 ---");
+console.log(`最終的な配列: [${arr.join(", ")}] [5]`);
+console.log(`最終的なオブジェクト: ${JSON.stringify(obj)} [6]`);
+
+// 5. Array.prototype.forEach() を使用した反復処理の例 [12, 13]
+console.log("\n--- Array.prototype.forEach() で要素を処理 ---");
+arr.forEach((item, index) => {
+  // forEachのコールバック関数は、要素、添字、配列自体を受け取る [14]
+  console.log(`要素: ${item}, 添字: ${index}`); [13]
+});
+
+// 6. Object.entries() を使用したオブジェクトの反復処理の例
+console.log("\n--- Object.entries() でオブジェクトのプロパティを処理 ---");
+Object.entries(obj).forEach(([key, value]) => { [15]
+  console.log(`キー: ${key}, 値: ${value}`);
+});
