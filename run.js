@@ -6,25 +6,46 @@ const path = require('path');
 const args = process.argv.slice(2);
 
 if (args.length === 0) {
-  console.log('使い方: node run.js <問題名> [解答ファイル]');
+  console.log('使い方: node run.js <問題名> [オプション]');
   console.log('');
   console.log('例:');
-  console.log('  node run.js fizzbuzz           # 問題を表示');
-  console.log('  node run.js fizzbuzz answer.js # 解答を実行・検証');
+  console.log('  node run.js fizzbuzz            # 問題を表示');
+  console.log('  node run.js fizzbuzz --test     # answers/fizzbuzz.js で検証');
+  console.log('  node run.js fizzbuzz --run 5    # 引数5で実行して結果を確認');
+  console.log('  node run.js fizzbuzz answer.js  # 指定ファイルで検証');
   console.log('');
   console.log('利用可能な問題:');
   const problemsDir = path.join(__dirname, 'problems');
   if (fs.existsSync(problemsDir)) {
     fs.readdirSync(problemsDir)
-      .filter(f => f.endsWith('.js'))
+      .filter(f => f.endsWith('.js') && !f.startsWith('_'))
       .forEach(f => console.log(`  - ${f.replace('.js', '')}`));
   }
   process.exit(0);
 }
 
 const problemName = args[0];
-const answerFile = args[1];
 const problemPath = path.join(__dirname, 'problems', `${problemName}.js`);
+
+// オプションの処理
+let answerFile = null;
+let runArgs = null;
+
+if (args[1] === '--test' || args[1] === '-t') {
+  answerFile = path.join(__dirname, 'answers', `${problemName}.js`);
+} else if (args[1] === '--run' || args[1] === '-r') {
+  // --run: 任意の引数で実行
+  answerFile = path.join(__dirname, 'answers', `${problemName}.js`);
+  runArgs = args.slice(2).map(arg => {
+    try {
+      return JSON.parse(arg);
+    } catch {
+      return arg; // パースできなければ文字列として扱う
+    }
+  });
+} else if (args[1]) {
+  answerFile = args[1];
+}
 
 if (!fs.existsSync(problemPath)) {
   console.error(`問題 "${problemName}" が見つかりません`);
@@ -51,15 +72,39 @@ if (!answerFile) {
   process.exit(0);
 }
 
+// --run モード: 任意の引数で実行
+if (runArgs !== null) {
+  if (!fs.existsSync(answerFile)) {
+    console.error(`解答ファイル "${answerFile}" が見つかりません`);
+    process.exit(1);
+  }
+  const answer = require(path.resolve(answerFile));
+  console.log(`実行: ${problem.title}`);
+  console.log(`引数: ${JSON.stringify(runArgs)}`);
+  console.log('-'.repeat(50));
+  try {
+    const result = answer(...runArgs);
+    console.log('結果:', JSON.stringify(result, null, 2));
+  } catch (err) {
+    console.error('エラー:', err.message);
+    process.exit(1);
+  }
+  process.exit(0);
+}
+
 // 解答を実行・検証
 if (!fs.existsSync(answerFile)) {
   console.error(`解答ファイル "${answerFile}" が見つかりません`);
+  console.error('');
+  console.error('ヒント: answers/ ディレクトリに解答を作成してください');
+  console.error(`  例: answers/${problemName}.js`);
   process.exit(1);
 }
 
 const answer = require(path.resolve(answerFile));
 
 console.log(`テスト実行: ${problem.title}`);
+console.log(`解答ファイル: ${answerFile}`);
 console.log('-'.repeat(50));
 
 let passed = 0;
